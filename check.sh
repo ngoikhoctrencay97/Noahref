@@ -9,11 +9,10 @@ echo '*/5 * * * * root cd && /usr/bin/sh /root/shardeum_check.sh' >> /etc/cronta
 
 # Bước 2: Tạo file shardeum_check.sh
 cat <<SCRIPT > /root/shardeum_check.sh
-docker exec shardeum-dashboard operator-cli status | grep stopped
-if docker exec shardeum-dashboard operator-cli status | grep -q stopped; then
+docker exec shardeum-dashboard operator-cli status | grep stopped && {
     echo "START SHARDEUM"
     docker exec shardeum-dashboard operator-cli start
-fi
+}
 SCRIPT
 
 # Bước 3: Cấp quyền thực thi cho script shardeum_check.sh
