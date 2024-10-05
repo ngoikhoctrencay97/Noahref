@@ -49,8 +49,8 @@ services:
     volumes:
       - /root/chromium/config:/config
     ports:
-      - 2009:2009
-      - 2012:2012
+      - 2009:3000
+      - 2012:3001
     shm_size: "1gb"
     restart: unless-stopped
 EOF
