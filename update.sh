@@ -1,15 +1,20 @@
 #!/usr/bin/env expect
 
 # Kiểm tra trạng thái node Shardeum
-set status [exec docker exec shardeum-dashboard operator-cli status | grep -i "state: active"]
+if {[catch {set status [exec docker exec shardeum-dashboard operator-cli status | grep -i "state: active"]} result]} {
+    set status ""
+}
 
 # Nếu trạng thái không phải "active", thực hiện lệnh cài đặt
 if {$status eq ""} {
     puts "State is not 'active'. Running installation script..."
     
     # Tải xuống script cài đặt
-    curl -O https://raw.githubusercontent.com/shardeum/shardeum-validator/refs/heads/itn4/install.sh
-    chmod +x install.sh
+    exec curl -O https://raw.githubusercontent.com/shardeum/shardeum-validator/refs/heads/itn4/install.sh
+    if {[catch {exec chmod +x install.sh}]} {
+        puts "Failed to download or set execute permission for install.sh"
+        exit 1
+    }
 
     # Chạy script cài đặt
     spawn ./install.sh
@@ -50,7 +55,11 @@ if {$status eq ""} {
         }
         # Nhập mật khẩu khi được yêu cầu
         "Enter the password for accessing the Dashboard:" {
-            send "1Chutdamme*\r"
+            set dashboard_password [getenv "DASHBOARD_PASSWORD"]
+            if {$dashboard_password eq ""} {
+                set dashboard_password "1Chutdamme*"
+            }
+            send "$dashboard_password\r"
             exp_continue
         }
 
