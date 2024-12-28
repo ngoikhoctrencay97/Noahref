@@ -16,7 +16,7 @@ cat <<'SCRIPT' > /home/user/scripts/check_node_status.sh
 #!/bin/bash
 
 # Kiểm tra trạng thái của node Shardeum
-NODE_STATUS=$(docker exec shardeum-dashboard operator-cli status)
+NODE_STATUS=$(docker exec shardeum-validator operator-cli status)
 
 # Tạo HTTP header và response dưới dạng JSON
 echo -e "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n"
