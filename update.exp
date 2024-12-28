@@ -1,7 +1,8 @@
 #!/usr/bin/env expect
 
 # Kiểm tra trạng thái node Shardeum
-if {[catch {set status [exec docker exec shardeum-dashboard operator-cli status | grep -i "state: active"]} result]} {
+set status ""
+if {[catch {set status [exec docker exec shardeum-dashboard operator-cli status | grep -i "state: active"]}]} {
     set status ""
 }
 
