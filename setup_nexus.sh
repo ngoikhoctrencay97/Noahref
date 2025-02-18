@@ -15,7 +15,7 @@ tmux send-keys -t $SESSION_NAME "source \$HOME/.cargo/env" C-m
 tmux send-keys -t $SESSION_NAME "curl https://cli.nexus.xyz/ | sh" C-m C-m C-m
 
 # Dừng script tại đây (tương đương nhấn Ctrl+C)
-sleep 600
+sleep 300
 tmux send-keys -t $SESSION_NAME C-c
 
 # Tiếp tục thực thi các lệnh còn lại
