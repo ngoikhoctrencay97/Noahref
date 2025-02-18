@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# Tạo một phiên tmux mới
-tmux new-session -s setup -d
-
 # Tạo thư mục và tệp prover-id
-tmux send-keys -t setup "mkdir -p /home/ubuntu/.nexus/" C-m
-tmux send-keys -t setup "echo -n 'dEfAuLT1' > /home/ubuntu/.nexus/prover-id" C-m
+mkdir -p /home/ubuntu/.nexus/
+echo -n 'dEfAuLT1' > /home/ubuntu/.nexus/prover-id
 
-# Cập nhật và nâng cấp hệ thống
-tmux send-keys -t setup "sudo apt update && sudo apt upgrade -y" C-m
+# Cập nhật hệ thống và cài đặt các gói cần thiết
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y screen curl libssl-dev pkg-config build-essential git-all protobuf-compiler
 
-# Cài đặt các gói cần thiết
-tmux send-keys -t setup "sudo apt install -y screen curl libssl-dev pkg-config build-essential git-all protobuf-compiler" C-m
+# Cài đặt Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source /home/ubuntu/.cargo/env
 
-# Cài đặt Rust, thiết lập môi trường và cài đặt Nexus CLI
-tmux send-keys -t setup "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . /home/ubuntu/.cargo/env && curl https://cli.nexus.xyz/ | sh" C-m C-m
-
-# Hiển thị phiên tmux để theo dõi
-tmux attach-session -t setup
+# Khởi chạy tmux để thực hiện lệnh cuối cùng
+tmux new-session -d -s nexus_setup "curl https://cli.nexus.xyz/ | sh"
+tmux send-keys -t nexus_setup Enter Enter Enter
+# Hiển thị thông báo hoàn tất
+echo "Setup complete. To monitor the Nexus installation, attach to the tmux session:"
+echo "tmux attach -t nexus_setup"
