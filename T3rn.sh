@@ -96,8 +96,11 @@ download_and_extract_binary() {
 
 set_environment_variables() {
     export NODE_ENV=testnet
-    export LOG_LEVEL=info
+    export LOG_LEVEL=debug
     export LOG_PRETTY=false
+    export EXECUTOR_PROCESS_BIDS_ENABLED=true
+    export EXECUTOR_PROCESS_ORDERS_ENABLED=true
+    export EXECUTOR_PROCESS_CLAIMS_ENABLED=true
     log "INFO" "Environment variables set: NODE_ENV=$NODE_ENV, LOG_LEVEL=$LOG_LEVEL, LOG_PRETTY=$LOG_PRETTY"
 }
 
