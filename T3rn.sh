@@ -9,18 +9,23 @@ log() {
 # Hàm nhập private key
 get_private_key() {
     while true; do
-        read -p "Enter your Metamask Private Key (without 0x prefix): " PRIVATE_KEY_LOCAL
-        PRIVATE_KEY_LOCAL=${PRIVATE_KEY_LOCAL#0x}  # Loại bỏ tiền tố '0x' nếu có
+        echo "Enter your Metamask Private Key (without 0x prefix):"
+        read -r PRIVATE_KEY_LOCAL
 
-        if [ ${#PRIVATE_KEY_LOCAL} -eq 64 ]; then
+        # Loại bỏ tiền tố '0x' nếu có
+        PRIVATE_KEY_LOCAL=$(echo "$PRIVATE_KEY_LOCAL" | sed 's/^0x//')
+
+        # Kiểm tra khóa riêng có đúng 64 ký tự và là chuỗi hexa hợp lệ
+        if [[ ${#PRIVATE_KEY_LOCAL} -eq 64 && "$PRIVATE_KEY_LOCAL" =~ ^[a-fA-F0-9]+$ ]]; then
             export PRIVATE_KEY_LOCAL
-            log "INFO" "Private key has been set."
+            log "INFO" "Private key has been set successfully."
             break
         else
-            log "ERROR" "Invalid private key. It must be 64 characters long (without 0x prefix)."
+            log "ERROR" "Invalid private key. It must be 64 characters long and contain only hexadecimal characters (without 0x prefix)."
         fi
     done
 }
+
 
 # Các hàm khác (giữ nguyên)
 remove_old_service() {
