@@ -8,6 +8,22 @@ log() {
 
 # Hàm nhập private key
 get_private_key() {
+    # Kiểm tra xem biến môi trường PRIVATE_KEY_LOCAL đã được thiết lập chưa
+    if [[ -n "$PRIVATE_KEY_LOCAL" ]]; then
+        # Xử lý giá trị từ biến môi trường
+        PRIVATE_KEY_LOCAL=$(echo "$PRIVATE_KEY_LOCAL" | sed 's/^0x//')
+
+        # Kiểm tra tính hợp lệ của khóa riêng
+        if [[ ${#PRIVATE_KEY_LOCAL} -eq 64 && "$PRIVATE_KEY_LOCAL" =~ ^[a-fA-F0-9]+$ ]]; then
+            log "INFO" "Private key has been set from environment variable."
+            return 0
+        else
+            log "ERROR" "Invalid private key in environment variable. It must be 64 characters long and contain only hexadecimal characters."
+            exit 1
+        fi
+    fi
+
+    # Nếu biến chưa được thiết lập, yêu cầu người dùng nhập
     while true; do
         echo "Enter your Metamask Private Key (without 0x prefix):"
         read -r PRIVATE_KEY_LOCAL
@@ -15,7 +31,7 @@ get_private_key() {
         # Loại bỏ tiền tố '0x' nếu có
         PRIVATE_KEY_LOCAL=$(echo "$PRIVATE_KEY_LOCAL" | sed 's/^0x//')
 
-        # Kiểm tra khóa riêng có đúng 64 ký tự và là chuỗi hexa hợp lệ
+        # Kiểm tra tính hợp lệ của khóa riêng
         if [[ ${#PRIVATE_KEY_LOCAL} -eq 64 && "$PRIVATE_KEY_LOCAL" =~ ^[a-fA-F0-9]+$ ]]; then
             export PRIVATE_KEY_LOCAL
             log "INFO" "Private key has been set successfully."
@@ -25,6 +41,7 @@ get_private_key() {
         fi
     done
 }
+
 
 
 # Các hàm khác (giữ nguyên)
